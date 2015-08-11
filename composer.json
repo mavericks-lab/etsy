@@ -1,0 +1,21 @@
+{
+    "name": "maverickslab/etsy",
+    "description": "",
+    "authors": [
+        {
+            "name": "maverickslab",
+            "email": "info@maverickstechnologies.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "5.0.*",
+        "guzzle/guzzle": "~3.9"
+    },
+    "autoload": {
+        "psr-0": {
+            "Maverickslab\\Etsy": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
