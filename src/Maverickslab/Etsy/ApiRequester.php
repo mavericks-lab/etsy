@@ -1,0 +1,201 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: root
+ * Date: 3/16/15
+ * Time: 10:56 PM
+ */
+
+namespace Maverickslab\Etsy;
+
+
+use Guzzle\Service\Client;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
+use Maverickslab\Etsy\Exceptions\EtsyException;
+use OAuth;
+
+class ApiRequester {
+
+    /**
+     * @var
+     */
+    private $client;
+
+    private $baseUrl = 'https://openapi.etsy.com';
+
+    private $oauth;
+
+    private $url;
+
+    public $tokenSecret;
+
+    public $storeToken;
+
+    public  $resource;
+
+    public function __construct(Client $client){
+        $this->client = $client;
+        $this->oauth =  new OAuth(env('ETSY_CONSUMER_ID'), env('ETSY_CONSUMER_SECRET'));
+    }
+
+
+    public function install(){
+        $requestToken = $this->oauth->getRequestToken( $this->getRequestTokenUrl (), $this->getInstallationRedirectUrl () );
+
+        Session::put('request_secret', $requestToken['oauth_token_secret']);
+
+        return redirect($requestToken['login_url']);
+    }
+
+
+    public function getAccessToken($response_params){
+        $request_secret = Session::get ( 'request_secret' );
+        if(is_null( $request_secret ))
+            throw new EtsyException('No request secret provided');
+
+        if(!isset($response_params['oauth_token']) || is_null($response_params['oauth_token']))
+            throw new EtsyException('No Oauth token provided');
+
+        $request_token = $response_params['oauth_token'];
+        $oauth_verifier = $response_params['oauth_verifier'];
+
+        $this->oauth->setToken($request_token, $request_secret);
+        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'v2/oauth/access_token', null, $oauth_verifier);
+
+        return $oauthToken;
+    }
+
+
+
+    public function get( $protected = true, $resourceId = null, $options = [] )
+    {
+        $this->url = $this->baseUrl.$this->resource;
+
+        if(!is_null($resourceId))
+            $this->url .= '/'.$resourceId;
+
+        return $this->makeGetRequest( $protected, $options );
+    }
+
+    public function post ( $postData )
+    {
+        $this->makeOauthRequest( 'POST', $postData );
+    }
+
+    public function put ( $postData )
+    {
+        $this->makeOauthRequest('PUT', $postData);
+    }
+
+
+    private function makeOauthRequest ( $method, $postData )
+    {
+        $this->setToken();
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
+        $this->oauth->fetch($this->url, $postData, $method, $headers);
+        $response = json_decode($this->$oauth->getLastResponse(), true);
+        return $response;
+    }
+
+    private function makeGetRequest( $protected, $parameters ){
+        $headers = $this->getHeaders();
+        $headers[] = 'Content-Type: application/json';
+        if($protected){
+            $this->setToken();
+            $oauthHeader = $this->oauth->getRequestHeader('GET', $this->url);
+            $headers[] = 'Authorization: '.$oauthHeader;
+        }else{
+            $parameters['api_key'] = $this->getClientId();
+            $this->url = $this->url.$this->getQueryString( $parameters );
+        }
+        return $this->client->get($this->url, $headers)->send()->json();
+    }
+
+
+    public function getQueryString($options)
+    {
+        if(sizeof($options) > 0){
+            return '?'.http_build_query($options);
+        }
+    }
+
+
+
+    public function getClientId()
+    {
+        $clientId = config('etsy.CLIENT_ID');
+
+        if(is_null($clientId))
+        {
+            throw new EtsyException('No Etsy Client ID provided');
+        }
+
+        return $clientId;
+    }
+
+
+    public function getClientSecret()
+    {
+        $clientSecret = config('etsy.CLIENT_SECRET');
+
+        if(is_null($clientSecret))
+        {
+            throw new EtsyException('No Etsy Client Secret provided');
+        }
+
+        return $clientSecret;
+    }
+
+
+
+    public function getStoreToken()
+    {
+        if(is_null($this->storeToken))
+        {
+            throw new EtsyException('Access token not provided');
+        }
+        return $this->storeToken;
+    }
+
+
+
+    public function getHeaders()
+    {
+        return [
+            'x-api-key: '.config('etsy.CLIENT_ID')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    private function getRequestTokenUrl ()
+    {
+        return $this->baseUrl . '/v2/oauth/request_token';
+    }
+
+    private function getInstallationRedirectUrl ()
+    {
+        $redirect_url = config ( 'etsy.INSTALLATION_REDIRECT_URL' );
+        if(is_null($redirect_url))
+            throw new EtsyException(' Installation redirect url not provided ');
+
+        return $redirect_url;
+    }
+
+    private function setToken()
+    {
+        if(is_null($this->storeToken))
+            throw new EtsyException(' Store token not provided');
+
+        if(is_null($this->tokenSecret))
+            throw new EtsyException('Token secret not provided');
+
+            $this->oauth->setToken ( $this->storeToken, $this->tokenSecret );
+    }
+
+
+
+}

@@ -8,18 +8,15 @@
 
 namespace Maverickslab\Etsy;
 
-use Maverickslab\Etsy\Exceptions\ShopifyException;
+use Illuminate\Support\Facades\App;
+
 
 class Etsy {
 
-    /**
-     * @var
-     */
-    public  $requestor;
+    public  $requester;
 
-    public function __construct(ApiRequestor $requestor){
-
-        $this->requestor = $requestor;
+    public function __construct(ApiRequester $requester){
+        $this->requester = $requester;
     }
 
 
@@ -27,20 +24,19 @@ class Etsy {
     public function __call($methodName, $arguments){
         $class = $this->resolveClass($methodName);
 
-        return new $class($this->requestor);
+        return new $class($this->requester);
     }
 
 
     public function install()
     {
-//        return 'installing';
-        return $this->requestor->install();
+        return $this->requester->install();
     }
 
 
     public function getAccessToken($responseParams)
     {
-        return $this->requestor->getAccessToken($responseParams);
+        return $this->requester->getAccessToken($responseParams);
     }
 
 
@@ -55,11 +51,10 @@ class Etsy {
     }
 
 
-    public function shop($storeToken = null, $tokenSecret = null)
+    public function authorization($storeToken = null, $tokenSecret = null)
     {
-        $this->requestor->storeToken = $storeToken;
-        $this->requestor->tokenSecret = $tokenSecret;
-
+        $this->requester->storeToken = $storeToken;
+        $this->requester->tokenSecret = $tokenSecret;
         return $this;
     }
 
@@ -78,6 +73,6 @@ class Etsy {
 
     public function getNamespace()
     {
-        return 'Maverickslab\Shopify\Resources\\';
+        return 'Maverickslab\Etsy\Resources\\';
     }
 } 
