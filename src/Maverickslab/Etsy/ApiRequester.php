@@ -64,7 +64,7 @@ class ApiRequester {
         $oauth_verifier = $response_params['oauth_verifier'];
 
         $this->oauth->setToken($request_token, $request_secret);
-        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'/oauth/access_token', null, $oauth_verifier);
+        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'v2/oauth/access_token', null, $oauth_verifier);
 
         return $oauthToken;
     }
@@ -108,9 +108,8 @@ class ApiRequester {
             $this->setToken();
             $this->oauth->fetch($this->url, null, OAUTH_HTTP_METHOD_GET);
             $json = $this->oauth->getLastResponse();
-            return $json;
+            return json_decode($json, true);
         }
-
         $headers = $this->getHeaders();
         $headers[] = 'Content-Type: application/json';
         $parameters['api_key'] = $this->getClientId();
