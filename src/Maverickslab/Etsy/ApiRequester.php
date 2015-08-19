@@ -9,6 +9,7 @@
 namespace Maverickslab\Etsy;
 
 
+use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Service\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
@@ -22,7 +23,7 @@ class ApiRequester {
      */
     private $client;
 
-    private $baseUrl = 'https://openapi.etsy.com';
+    private $baseUrl = 'https://openapi.etsy.com/v2';
 
     private $oauth;
 
@@ -34,9 +35,11 @@ class ApiRequester {
 
     public  $resource;
 
+    public $associations;
+
     public function __construct(Client $client){
         $this->client = $client;
-        $this->oauth =  new OAuth(env('ETSY_CONSUMER_ID'), env('ETSY_CONSUMER_SECRET'));
+        $this->oauth =  new OAuth($this->getClientId(), $this->getClientSecret());
     }
 
 
@@ -61,7 +64,7 @@ class ApiRequester {
         $oauth_verifier = $response_params['oauth_verifier'];
 
         $this->oauth->setToken($request_token, $request_secret);
-        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'v2/oauth/access_token', null, $oauth_verifier);
+        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'/oauth/access_token', null, $oauth_verifier);
 
         return $oauthToken;
     }
@@ -100,16 +103,19 @@ class ApiRequester {
     }
 
     private function makeGetRequest( $protected, $parameters ){
+        if($protected){
+            $this->oauth = new OAuth($this->getClientId(), $this->getClientSecret(), OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
+            $this->setToken();
+            $this->oauth->fetch($this->url, null, OAUTH_HTTP_METHOD_GET);
+            $json = $this->oauth->getLastResponse();
+            return $json;
+        }
+
         $headers = $this->getHeaders();
         $headers[] = 'Content-Type: application/json';
-        if($protected){
-            $this->setToken();
-            $oauthHeader = $this->oauth->getRequestHeader('GET', $this->url);
-            $headers[] = 'Authorization: '.$oauthHeader;
-        }else{
-            $parameters['api_key'] = $this->getClientId();
-            $this->url = $this->url.$this->getQueryString( $parameters );
-        }
+        $parameters['api_key'] = $this->getClientId();
+        $this->url = $this->url.$this->getQueryString( $parameters );
+
         return $this->client->get($this->url, $headers)->send()->json();
     }
 
@@ -173,7 +179,7 @@ class ApiRequester {
      */
     private function getRequestTokenUrl ()
     {
-        return $this->baseUrl . '/v2/oauth/request_token';
+        return $this->baseUrl . '/oauth/request_token';
     }
 
     private function getInstallationRedirectUrl ()

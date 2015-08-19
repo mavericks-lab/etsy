@@ -58,6 +58,12 @@ class Etsy {
         return $this;
     }
 
+
+    public function with ( $associations = [ ] )
+    {
+
+    }
+
     /**
      * @param $className
      * @return bool

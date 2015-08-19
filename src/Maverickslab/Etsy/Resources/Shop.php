@@ -16,7 +16,7 @@ class Shop {
 
     public function __construct( ApiRequester $requester){
         $this->requester = $requester;
-        $this->requester->resource = '/v2/shops';
+        $this->requester->resource = '/shops';
     }
 
 
