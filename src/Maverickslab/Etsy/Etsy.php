@@ -43,6 +43,7 @@ class Etsy {
     public function resolveClass($className)
     {
         $class = $this->getNamespace().$this->sanitizeClassName ( $className );
+
         if( class_exists($class) ){
             return $class;
         }
