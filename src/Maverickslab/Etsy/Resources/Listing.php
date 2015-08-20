@@ -38,4 +38,12 @@ class Listing {
         return $this->requester->get( false, null, $parameters );
     }
 
+
+    public function getListingVariations ( $listingId, $parameters = [] )
+    {
+        $this->requester->resource = '/listings/'.$listingId.'/variations';
+
+        return $this->requester->get( true, null, $parameters );
+    }
+
 }
