@@ -64,7 +64,7 @@ class ApiRequester {
         $oauth_verifier = $response_params['oauth_verifier'];
 
         $this->oauth->setToken($request_token, $request_secret);
-        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'v2/oauth/access_token', null, $oauth_verifier);
+        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'/oauth/access_token', null, $oauth_verifier);
 
         return $oauthToken;
     }
@@ -103,6 +103,7 @@ class ApiRequester {
     }
 
     private function makeGetRequest( $protected, $parameters ){
+        $this->appendAssociations();
         if($protected){
             $this->oauth = new OAuth($this->getClientId(), $this->getClientSecret(), OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
             $this->setToken();
@@ -122,7 +123,8 @@ class ApiRequester {
     public function getQueryString($options)
     {
         if(sizeof($options) > 0){
-            return '?'.http_build_query($options);
+            $binder = (strpos($this->url, '?') !== FALSE) ? '&' : '?';
+            return $binder.http_build_query($options);
         }
     }
 
@@ -201,6 +203,12 @@ class ApiRequester {
             $this->oauth->setToken ( $this->storeToken, $this->tokenSecret );
     }
 
+    private function appendAssociations ()
+    {
+        if(sizeof($this->associations) > 0){
+            $this->url .= '?includes='.implode(',', $this->associations);
+        }
+    }
 
 
 }

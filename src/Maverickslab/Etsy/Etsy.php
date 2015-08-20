@@ -62,7 +62,8 @@ class Etsy {
 
     public function with ( $associations = [ ] )
     {
-
+        $this->requester->associations = $associations;
+        return $this;
     }
 
     /**

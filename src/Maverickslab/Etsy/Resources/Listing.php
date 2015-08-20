@@ -23,7 +23,7 @@ class Listing {
     }
 
 
-    public function getAllShopActiveListings ( $shopId, $parameters )
+    public function getAllShopActiveListings ( $shopId, $parameters = [] )
     {
         $this->requester->resource = '/shops/'.$shopId.'/listings/active';
 
@@ -31,7 +31,7 @@ class Listing {
     }
 
 
-    public function getAllShopDraftListings ( $shopId, $parameters )
+    public function getAllShopDraftListings ( $shopId, $parameters = [])
     {
         $this->requester->resource = '/shops/'.$shopId.'/listings/draft';
 
