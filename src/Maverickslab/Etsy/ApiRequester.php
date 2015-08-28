@@ -47,8 +47,8 @@ class ApiRequester {
         $requestToken = $this->oauth->getRequestToken( $this->getRequestTokenUrl (), $this->getInstallationRedirectUrl () );
 
         Session::put('request_secret', $requestToken['oauth_token_secret']);
-
-        return redirect($requestToken['login_url']);
+        return ['redirect_url' => $requestToken['login_url']];
+//        return redirect($requestToken['login_url']);
     }
 
 
