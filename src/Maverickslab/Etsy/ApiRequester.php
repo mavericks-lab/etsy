@@ -45,16 +45,13 @@ class ApiRequester {
 
     public function install(){
         $requestToken = $this->oauth->getRequestToken( $this->getRequestTokenUrl (), $this->getInstallationRedirectUrl () );
-
-        Session::put('request_secret', $requestToken['oauth_token_secret']);
         return $requestToken;
     }
 
 
     public function getAccessToken($response_params){
-        $request_secret = Session::get ( 'request_secret' );
-        if(is_null( $request_secret ))
-            throw new EtsyException('No request secret provided');
+        if(!isset($response_params['request_secret']) || is_null($response_params['request_secret']))
+            throw new EtsyException('The request secret has not been provided');
 
         if(!isset($response_params['oauth_token']) || is_null($response_params['oauth_token']))
             throw new EtsyException('No Oauth token provided');
@@ -62,7 +59,7 @@ class ApiRequester {
         $request_token = $response_params['oauth_token'];
         $oauth_verifier = $response_params['oauth_verifier'];
 
-        $this->oauth->setToken($request_token, $request_secret);
+        $this->oauth->setToken($request_token, $response_params['request_secret']);
         $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'/oauth/access_token', null, $oauth_verifier);
 
         return $oauthToken;
