@@ -46,4 +46,11 @@ class Listing {
         return $this->requester->get( true, null, $parameters );
     }
 
+
+    public function getAllListingImages( $listingId)
+    {
+        $this->requester->resource = '/listings/'.$listingId.'/images';
+        return $this->requester->get( false);
+    }
+
 }
