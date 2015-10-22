@@ -10,6 +10,7 @@ namespace Maverickslab\Etsy;
 
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
+use Guzzle\Plugin\Oauth\OauthPlugin;
 use Guzzle\Service\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
@@ -79,23 +80,32 @@ class ApiRequester {
 
     public function post ( $postData )
     {
-        $this->makeOauthRequest( 'POST', $postData );
+        return $this->makeOauthRequest( 'POST', $postData );
     }
 
     public function put ( $postData )
     {
-        $this->makeOauthRequest('PUT', $postData);
+        return $this->makeOauthRequest('PUT', $postData);
     }
 
 
     private function makeOauthRequest ( $method, $postData )
     {
-        $this->setToken();
+        /*$this->setToken();
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
         $this->oauth->fetch($this->url, $postData, $method, $headers);
         $response = json_decode($this->$oauth->getLastResponse(), true);
-        return $response;
+        return $response;*/
+        $client = new Client($this->baseUrl);
+        $oauth = new OauthPlugin([
+            'consumer_key' => 'h7p0zgfpzdhnsokqlk6oyyte',
+            'consumer_secret' => 'ae4rsjrogp',
+            'token' => 'c315a7a7397ca98f69825deba91400',
+            'token_secret' => '1df22e7418'
+        ]);
+        $client->addSubscriber($oauth);
+        return $client->post($this->resource, [], $postData, []);
     }
 
     private function makeGetRequest( $protected, $parameters ){
