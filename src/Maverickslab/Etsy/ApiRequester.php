@@ -91,21 +91,12 @@ class ApiRequester {
 
     private function makeOauthRequest ( $method, $postData )
     {
-        /*$this->setToken();
+        $this->setToken();
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
         $this->oauth->fetch($this->url, $postData, $method, $headers);
         $response = json_decode($this->$oauth->getLastResponse(), true);
-        return $response;*/
-        $client = new Client($this->baseUrl);
-        $oauth = new OauthPlugin([
-            'consumer_key' => 'h7p0zgfpzdhnsokqlk6oyyte',
-            'consumer_secret' => 'ae4rsjrogp',
-            'token' => 'c315a7a7397ca98f69825deba91400',
-            'token_secret' => '1df22e7418'
-        ]);
-        $client->addSubscriber($oauth);
-        return $client->post($this->resource, [], $postData, []);
+        return $response;
     }
 
     private function makeGetRequest( $protected, $parameters ){
