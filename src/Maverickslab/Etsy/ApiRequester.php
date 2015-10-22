@@ -79,12 +79,12 @@ class ApiRequester {
 
     public function post ( $postData )
     {
-        $this->makeOauthRequest( 'POST', $postData );
+        return $this->makeOauthRequest( 'POST', $postData );
     }
 
     public function put ( $postData )
     {
-        $this->makeOauthRequest('PUT', $postData);
+        return $this->makeOauthRequest('PUT', $postData);
     }
 
 

@@ -53,4 +53,9 @@ class Listing {
         return $this->requester->get( false);
     }
 
+    public function createListing( $listingData ){
+        $this->requester->resource = '/listings';
+        return $this->requester->post( $listingData );
+    }
+
 }
