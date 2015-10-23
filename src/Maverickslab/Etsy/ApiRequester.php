@@ -94,7 +94,9 @@ class ApiRequester {
         $this->setToken();
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
         $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
-        $this->oauth->fetch($this->url, $postData, $method, $headers);
+        \Log::info($this->url);
+        \Log::info($this->resource);
+        $this->oauth->fetch($this->resource, $postData, $method, $headers);
         $response = json_decode($this->$oauth->getLastResponse(), true);
         return $response;
     }
