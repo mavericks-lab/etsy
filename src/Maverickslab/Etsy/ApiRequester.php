@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use Maverickslab\Etsy\Exceptions\EtsyException;
 use OAuth;
+use OAuthException;
 
 class ApiRequester {
 
@@ -91,14 +92,21 @@ class ApiRequester {
 
     private function makeOauthRequest ( $method, $postData )
     {
-        $this->setToken();
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
-        $this->url = $this->baseUrl.$this->resource;
-        \Log::info($this->url);
-        $this->oauth->fetch($this->url, $postData, $method, $headers);
-        $response = json_decode($this->$oauth->getLastResponse(), true);
-        return $response;
+        try{
+            $this->setToken();
+            $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+            $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
+            $this->url = $this->baseUrl.$this->resource;
+
+            $this->oauth->fetch($this->url, $postData, $method, $headers);
+            $response = json_decode($this->oauth->getLastResponse(), true);
+            return $response;
+        }catch(OAuthException $e){
+
+            \Log::error('Etsy OAuthException', ['context'=> $e->getMessage()]);
+            \Log::warning('OAuth response', ['context'=> $this->oauth->getLastResponse()]);
+            \Log::warning('Debuggin info', ['context'=> $this->oauth->debugInfo]);
+        }
     }
 
     private function makeGetRequest( $protected, $parameters ){
