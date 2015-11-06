@@ -64,4 +64,17 @@ class Listing {
         return $this->requester->post( $listingData );
     }
 
+    public function createListingVariations( $listingId, $variations )
+    {
+        $this->requester->resource = '/listings/'.$listingId.'/variations';
+
+        return $this->requester->post( $variations );
+    }
+
+    public function createListingVariation($listingId, $propertyId, $variation)
+    {
+        $this->requester->resource = '/listings/'.$listingId.'/variations/'.$propertyId;
+        return $this->requester->post( $variation );
+    }
+
 }
