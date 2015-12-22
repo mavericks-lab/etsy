@@ -39,6 +39,14 @@ class Listing {
     }
 
 
+    public function getListing( $listingId )
+    {
+        $this->requester->resource = '/listings/';
+
+        return $this->requester->get( false, $listingId);
+    }
+
+
     public function getListingVariations ( $listingId, $parameters = [] )
     {
         $this->requester->resource = '/listings/'.$listingId.'/variations';
@@ -46,6 +54,10 @@ class Listing {
         return $this->requester->get( true, null, $parameters );
     }
 
+    public function updateListing($listingId, $parameters = []){
+        $this->requester->resource = '/listings/'.$listingId;
+        return $this->requester->put( $parameters);
+    }
 
     public function getAllListingImages( $listingId)
     {

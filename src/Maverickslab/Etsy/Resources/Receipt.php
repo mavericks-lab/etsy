@@ -23,9 +23,9 @@ class Receipt {
     }
 
 
-    public function getAllShopReceipts ( $shopId, $parameters=[], $status = 'all')
+    public function getAllShopReceipts ( $shopId, $parameters=[], $background= false, $status = 'all')
     {
-        $this->requester->resource = '/shops/'.$shopId.'/receipts/'.$status;
+        $this->requester->resource = ($background) ? '/shops/'.$shopId.'/receipts': '/shops/'.$shopId.'/receipts/'.$status ;
 
         return $this->requester->get( true, null, $parameters );
    }

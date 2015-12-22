@@ -114,6 +114,7 @@ class ApiRequester {
         if($protected){
             $this->oauth = new OAuth($this->getClientId(), $this->getClientSecret(), OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
             $this->setToken();
+            $this->url = $this->url.$this->getQueryString( $parameters );
             $this->oauth->fetch($this->url, null, OAUTH_HTTP_METHOD_GET);
             $json = $this->oauth->getLastResponse();
             return json_decode($json, true);
