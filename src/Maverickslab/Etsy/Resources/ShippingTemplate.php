@@ -31,4 +31,11 @@ class ShippingTemplate {
         return $this->requester->get( true, null, $parameters );
     }
 
+    public function createShippingTemplate( $parameters )
+    {
+        $this->requester->resource = '/shipping/templates';
+
+        return $this->requester->post( $parameters );
+    }
+
 } 
