@@ -28,6 +28,20 @@ class Receipt {
         $this->requester->resource = ($background) ? '/shops/'.$shopId.'/receipts': '/shops/'.$shopId.'/receipts/'.$status ;
 
         return $this->requester->get( true, null, $parameters );
-   }
+    }
+
+    public function updateReceipt( $receiptId, $receipt_details )
+    {
+        $this->requester->resource = '/receipts/'.$receiptId;
+
+        return $this->requester->put( $receipt_details );
+    }
+
+    public function submitTracking($shopId, $receiptId, $tracking_data )
+    {
+        $this->requester->resource = "/shops/{$shopId}/receipts/{$receiptId}/tracking";
+
+        return $this->requester->post( $tracking_data );
+    }
 
 }
