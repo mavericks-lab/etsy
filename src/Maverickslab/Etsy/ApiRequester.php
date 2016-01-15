@@ -102,10 +102,8 @@ class ApiRequester {
             $response = json_decode($this->oauth->getLastResponse(), true);
             return $response;
         }catch(OAuthException $e){
-
-            \Log::error('Etsy OAuthException', ['context'=> $e->getMessage()]);
-            \Log::warning('OAuth response', ['context'=> $this->oauth->getLastResponse()]);
-            \Log::warning('Debuggin info', ['context'=> $this->oauth->debugInfo]);
+            $errors[] = $this->oauth->getLastResponse();
+            throw new EtsyException('Etsy Exception', $errors);
         }
     }
 
