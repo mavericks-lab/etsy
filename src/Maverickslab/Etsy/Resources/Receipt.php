@@ -30,6 +30,13 @@ class Receipt {
         return $this->requester->get( true, null, $parameters );
     }
 
+    public function getReceipt($receiptId)
+    {
+        $this->requester->resource = '/receipts/';
+
+        return $this->requester->get( true, $receiptId);
+    }
+
     public function updateReceipt( $receiptId, $receipt_details )
     {
         $this->requester->resource = '/receipts/'.$receiptId;
