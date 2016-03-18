@@ -101,28 +101,35 @@ class ApiRequester {
             $this->oauth->fetch($this->url, $postData, $method, $headers);
             $response = json_decode($this->oauth->getLastResponse(), true);
             return $response;
-        }catch(OAuthException $e){
+        }catch(OAuthException $exception) {
             $errors[] = $this->oauth->getLastResponse();
-            throw new EtsyException('Etsy Exception', $errors);
+            throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(), $exception);
         }
     }
 
     private function makeGetRequest( $protected, $parameters ){
-        $this->appendAssociations();
-        if($protected){
-            $this->oauth = new OAuth($this->getClientId(), $this->getClientSecret(), OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-            $this->setToken();
+        try{
+            $this->appendAssociations();
+            if($protected){
+                $this->oauth = new OAuth($this->getClientId(), $this->getClientSecret(), OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
+                $this->setToken();
+                $this->url = $this->url.$this->getQueryString( $parameters );
+                $this->oauth->fetch($this->url, null, OAUTH_HTTP_METHOD_GET);
+                $json = $this->oauth->getLastResponse();
+                return json_decode($json, true);
+            }
+            $headers = $this->getHeaders();
+            $headers[] = 'Content-Type: application/json';
+            $parameters['api_key'] = $this->getClientId();
             $this->url = $this->url.$this->getQueryString( $parameters );
-            $this->oauth->fetch($this->url, null, OAUTH_HTTP_METHOD_GET);
-            $json = $this->oauth->getLastResponse();
-            return json_decode($json, true);
-        }
-        $headers = $this->getHeaders();
-        $headers[] = 'Content-Type: application/json';
-        $parameters['api_key'] = $this->getClientId();
-        $this->url = $this->url.$this->getQueryString( $parameters );
 
-        return $this->client->get($this->url, $headers)->send()->json();
+            return $this->client->get($this->url, $headers)->send()->json();
+        }catch (OAuthException $exception){
+            $errors[] = $this->oauth->getLastResponse();
+            throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(),$exception);
+        }catch(ClientErrorResponseException $exception){
+            throw new EtsyException($exception->getMessage(), [$exception->getResponse()->getBody(true)], $exception->getResponse()->getStatusCode(), $exception);
+        }
     }
 
 
