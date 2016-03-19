@@ -89,8 +89,12 @@ class ApiRequester {
         return $this->makeOauthRequest('PUT', $postData);
     }
 
+    public function delete(  )
+    {
+        return $this->makeOauthRequest('DELETE');
+    }
 
-    private function makeOauthRequest ( $method, $postData )
+    private function makeOauthRequest ( $method, $postData = [] )
     {
         try{
             $this->setToken();
