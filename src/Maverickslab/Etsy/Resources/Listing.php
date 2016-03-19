@@ -77,6 +77,7 @@ class Listing {
         return $this->requester->delete();
     }
 
+
     public function createListing( $listingData ){
         $this->requester->resource = '/listings';
         return $this->requester->post( $listingData );
