@@ -71,6 +71,12 @@ class Listing {
         return $this->requester->post( $parameters );
     }
 
+    public function deleteListingImage($listingId, $listingImageId)
+    {
+        $this->requester->resource = "/listings/{$listingId}/images/$listingImageId";
+        return $this->requester->delete(['listing_id' => $listingId, 'listing_image_id' => $listingImageId]);
+    }
+
     public function createListing( $listingData ){
         $this->requester->resource = '/listings';
         return $this->requester->post( $listingData );
