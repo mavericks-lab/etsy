@@ -77,6 +77,11 @@ class Listing {
         return $this->requester->delete();
     }
 
+    public function deleteListing($listingId){
+        $this->requester->resource = '/listings/'.$listingId;
+
+        return $this->requester->delete();
+    }
 
     public function createListing( $listingData ){
         $this->requester->resource = '/listings';
