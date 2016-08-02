@@ -23,9 +23,9 @@ class Listing {
     }
 
 
-    public function getAllShopActiveListings ( $shopId, $parameters = [] )
+    public function getAllShopListings ( $shopId, $parameters = [], $status = 'active' )
     {
-        $this->requester->resource = '/shops/'.$shopId.'/listings/active';
+        $this->requester->resource = "/shops/{{$shopId}}/listings/{{$status}}";
 
         return $this->requester->get( false, null, $parameters );
     }
