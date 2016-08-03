@@ -33,6 +33,12 @@ class Etsy {
         return $this->requester->install();
     }
 
+    public function getScopes()
+    {
+        $this->requester->resource = '/oauth/scopes';
+        return $this->requester->get( true );
+    }
+
 
     public function getAccessToken($responseParams)
     {
