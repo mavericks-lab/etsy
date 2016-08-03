@@ -27,7 +27,13 @@ class Listing {
     {
         $this->requester->resource = '/shops/'.$shopId.'/listings/'.$status;
 
-        return $this->requester->get( false, null, $parameters );
+        if($status == 'active'){
+            $response = $this->requester->get( false, null, $parameters );
+        }else{
+            $response = $this->requester->get( true, null, $parameters );
+        }
+
+        return $response;
     }
 
 
