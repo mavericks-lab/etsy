@@ -27,7 +27,7 @@ class Inventory {
     {
         $this->requester->resource = '/listings/'.$listingId.'/inventory';
 
-        $response = $this->requester->get( false, null, $parameters );
+        $response = $this->requester->get( true, null, $parameters );
         
         return $response;
     }
