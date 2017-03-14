@@ -45,7 +45,7 @@ class Listing {
     {
         $this->requester->resource = '/listings/';
 
-        return $this->requester->get( false, $listingId);
+        return $this->requester->get( true, $listingId);
     }
 
 
