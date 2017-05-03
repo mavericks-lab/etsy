@@ -9,9 +9,9 @@
 namespace Maverickslab\Etsy;
 
 
-use Guzzle\Http\Exception\ClientErrorResponseException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Guzzle\Plugin\Oauth\OauthPlugin;
-use Guzzle\Service\Client;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use Maverickslab\Etsy\Exceptions\EtsyException;
@@ -127,11 +127,17 @@ class ApiRequester {
             $parameters['api_key'] = $this->getClientId();
             $this->url = $this->url.$this->getQueryString( $parameters );
 
-            return $this->client->get($this->url, $headers)->send()->json();
+//            return $this->client->get($this->url, $headers)->send()->json();
+            $response = $this->client->get($this->url, [
+                'headers' => $headers,
+                'verify'  => true
+            ]);
+
+            return \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
         }catch (OAuthException $exception){
             $errors[] = $this->oauth->getLastResponse();
             throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(),$exception);
-        }catch(ClientErrorResponseException $exception){
+        }catch(ClientException $exception){
             throw new EtsyException($exception->getMessage(), [$exception->getResponse()->getBody(true)], $exception->getResponse()->getStatusCode(), $exception);
         }
     }
