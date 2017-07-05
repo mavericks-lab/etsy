@@ -31,11 +31,36 @@ class ShippingTemplate {
         return $this->requester->get( true, null, $parameters );
     }
 
+    public function getShippingTemplate( $shippingTemplateId)
+    {
+        $this->requester->resource = "/shipping/templates/{$shippingTemplateId}";
+        return $this->requester->get( true );
+    }
+
+    public function getAllShippingTemplateEntries( $shippingTemplateId )
+    {
+        $this->requester->resource = "/shipping/templates/{$shippingTemplateId}/entries";
+
+        return $this->requester->get(true);
+    }
+
     public function createShippingTemplate( $parameters )
     {
         $this->requester->resource = '/shipping/templates';
 
         return $this->requester->post( $parameters );
+    }
+
+    public function updateShippingTemplate( $shippingTemplateId, $parameters = [] )
+    {
+        $this->requester->resource = "/shipping/templates/{$shippingTemplateId}";
+        return $this->requester->put( $parameters );
+    }
+
+    public function deleteShippingTemplate( $shippingTemplateId )
+    {
+        $this->requester->resource = "/shipping/templates/{$shippingTemplateId}";
+        return $this->requester->delete();
     }
 
 } 
