@@ -46,8 +46,13 @@ class ApiRequester {
 
 
     public function install(){
-        $requestToken = $this->oauth->getRequestToken( $this->getRequestTokenUrl (), $this->getInstallationRedirectUrl () );
-        return $requestToken;
+        try {
+            $requestToken = $this->oauth->getRequestToken($this->getRequestTokenUrl(), $this->getInstallationRedirectUrl());
+            return $requestToken;
+        } catch (OAuthException $exception) {
+            $errors[] = $this->oauth->getLastResponse();
+            throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(), $exception);
+        }
     }
 
 
@@ -58,13 +63,16 @@ class ApiRequester {
         if(!isset($response_params['oauth_token']) || is_null($response_params['oauth_token']))
             throw new EtsyException('No Oauth token provided');
 
-        $request_token = $response_params['oauth_token'];
-        $oauth_verifier = $response_params['oauth_verifier'];
-
-        $this->oauth->setToken($request_token, $response_params['request_secret']);
-        $oauthToken = $this->oauth->getAccessToken($this->baseUrl.'/oauth/access_token', null, $oauth_verifier);
-
-        return $oauthToken;
+        try {
+            $request_token = $response_params['oauth_token'];
+            $oauth_verifier = $response_params['oauth_verifier'];
+            $this->oauth->setToken($request_token, $response_params['request_secret']);
+            $oauthToken = $this->oauth->getAccessToken($this->baseUrl . '/oauth/access_token', null, $oauth_verifier);
+            return $oauthToken;
+        } catch (OAuthException $exception) {
+            $errors[] = $this->oauth->getLastResponse();
+            throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(), $exception);
+        }
     }
 
 
@@ -133,7 +141,7 @@ class ApiRequester {
                 'verify'  => true
             ]);
 
-            return \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+            return json_decode($response->getBody()->getContents(), true);
         }catch (OAuthException $exception){
             $errors[] = $this->oauth->getLastResponse();
             throw new EtsyException($exception->getMessage(), $errors, $exception->getCode(),$exception);
