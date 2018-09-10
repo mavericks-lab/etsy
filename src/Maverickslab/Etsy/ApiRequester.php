@@ -47,6 +47,7 @@ class ApiRequester {
 
     public function install(){
         try {
+            $this->oauth->setAuthType(OAUTH_AUTH_TYPE_FORM);
             $requestToken = $this->oauth->getRequestToken($this->getRequestTokenUrl(), $this->getInstallationRedirectUrl());
             return $requestToken;
         } catch (OAuthException $exception) {
@@ -66,6 +67,7 @@ class ApiRequester {
         try {
             $request_token = $response_params['oauth_token'];
             $oauth_verifier = $response_params['oauth_verifier'];
+            $this->oauth->setAuthType(OAUTH_AUTH_TYPE_FORM);
             $this->oauth->setToken($request_token, $response_params['request_secret']);
             $oauthToken = $this->oauth->getAccessToken($this->baseUrl . '/oauth/access_token', null, $oauth_verifier);
             return $oauthToken;
@@ -105,6 +107,7 @@ class ApiRequester {
     private function makeOauthRequest ( $method, $postData = [] )
     {
         try{
+//            $this->oauth->setAuthType(OAUTH_AUTH_TYPE_AUTHORIZATION);
             $this->setToken();
             $headers[] = 'Content-Type: application/x-www-form-urlencoded';
             $this->oauth->setRequestEngine(OAUTH_REQENGINE_CURL);
