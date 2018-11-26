@@ -67,6 +67,12 @@ class Listing {
         return $this->requester->get( false);
     }
 
+    public function getListingImage( $listingId, $listingImageId)
+    {
+        $this->requester->resource = "/listings/$listingId/images/$listingImageId";
+        return $this->requester->get( false);
+    }
+
     public function uploadListingImage( $listingId, $parameters = [])
     {
         $this->requester->resource = '/listings/'.$listingId.'/images';
