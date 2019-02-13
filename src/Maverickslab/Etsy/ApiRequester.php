@@ -37,7 +37,7 @@ class ApiRequester {
 
     public  $resource;
 
-    public $associations;
+    public $associations = [];
 
     public function __construct(Client $client){
         $this->client = $client;
