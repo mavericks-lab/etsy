@@ -71,6 +71,7 @@ class Listing {
     {
         $this->requester->resource = "/listings/$listingId/images/$listingImageId";
         return $this->requester->get( false);
+
     }
 
     public function uploadListingImage( $listingId, $parameters = [])
